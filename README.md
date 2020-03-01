@@ -1,5 +1,5 @@
-# module-5-networking-Brutus314
-module-5-networking-Brutus314 created by GitHub Classroom
+# module-5-physics-Brutus314
+module-5-physics-Brutus314 created by GitHub Classroom
 
 This module contains 2 separate modules. PhysicsModule contains actual PhysX code and runs a physics engine.
 PseudoPhysicsModule does not contain PhysX code and does not run an engine. Instead, it receives messages from
