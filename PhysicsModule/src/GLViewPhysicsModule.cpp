@@ -140,23 +140,24 @@ void GLViewPhysicsModule::updateWorld()
 	   WORigidActor* bound_data = static_cast<WORigidActor*>(activeActors[i]->userData); // Get the pair
 	   PxTransform t = bound_data->actor->getGlobalPose(); // Get the transform
 	   PxMat44 new_pose = PxMat44(t); // Get the physx pose matrix
+	   Mat4 old_pose = bound_data->wo->getDisplayMatrix();
 	   // Collect the new pose into an aftr-acceptable state
-	   float convert[16] = {new_pose(0,0),new_pose(0,1), new_pose(0,2),new_pose(3,0),
-							new_pose(1,0),new_pose(1,1), new_pose(1,2),new_pose(3,1),
-							new_pose(2,0),new_pose(2,1), new_pose(2,2),new_pose(3,2),
-							new_pose(0,3),new_pose(1,3), new_pose(2,3),new_pose(3,3)};
+	   float convert[16] = {new_pose(0,0),new_pose(0,1), new_pose(0,2),old_pose[3],
+							new_pose(1,0),new_pose(1,1), new_pose(1,2),old_pose[7],
+							new_pose(2,0),new_pose(2,1), new_pose(2,2),old_pose[11],
+							old_pose[12], old_pose[13], old_pose[14], old_pose[15]};
 
 	   Mat4 aftr_mat(convert);
 	   // Send orientation net message to update an item's orientation
 	   NetMsgObjectOrientation msg;
-	   msg.location = Vector(aftr_mat[12], aftr_mat[13], aftr_mat[14]);
+	   msg.location = Vector(new_pose(0, 3), new_pose(1, 3), new_pose(2, 3));
 	   msg.orientation = aftr_mat;
 	   msg.wo_index = placed_cubes[bound_data->wo]; // Map data won't change like the worldLst
 	   client->sendNetMsgSynchronousTCP(msg);
 
 	   // Apply the new pose
 	   bound_data->wo->getModel()->setDisplayMatrix(aftr_mat);
-	   bound_data->wo->setPosition(aftr_mat[12], aftr_mat[13], aftr_mat[14]);
+	   bound_data->wo->setPosition(new_pose(0, 3), new_pose(1, 3), new_pose(2, 3));
    }
 }
 
